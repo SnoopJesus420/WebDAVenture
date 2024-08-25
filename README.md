@@ -11,3 +11,7 @@ string fileToExecute = Path.Combine(driveLetter, "change-me.bat"); // Adjust the
 string username = "example"; // Optional - set this to null if no username is needed
 string password = "example"; // Optional - set this to null if no pass is needed
 ```
+
+# Things to come
+1. Remove console window
+2. Implement better obfuscation techniques >:)
