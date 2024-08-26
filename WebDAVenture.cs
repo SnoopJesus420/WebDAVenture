@@ -30,11 +30,11 @@ namespace WebDAVLauncher
 
         static void Main(string[] args)
         {
-            string driveLetter = "drive letter as (Z:)";
-            string webdavUrl = "https://your-webdav-share";
-            string fileToExecute = Path.Combine(driveLetter, "change-me.bat"); // Adjust the file name and extension
-            string username = "example"; // Optional - set this to null if no username is needed
-            string password = "example"; // Optional - set this to null if no pass is needed
+            string driveLetter = "your drive letter as Z:";
+            string webdavUrl = "https://your-site.com/webdav";
+            string fileToExecute = Path.Combine(driveLetter, "change-me.bat"); // Adjust the file name and extension as needed
+            string username = "example"; // Set this to null if no username is needed
+            string password = "example"; // Set this to null if no password is needed
 
             try
             {
@@ -80,8 +80,23 @@ namespace WebDAVLauncher
 
             try
             {
-                Process.Start(filePath);
-                Console.WriteLine($"Successfully executed {filePath}");
+                var startInfo = new ProcessStartInfo
+                {
+                    FileName = filePath,
+                    UseShellExecute = true, // Ensures the shell is used to start the process
+                    CreateNoWindow = false  // Creates a window for the process (set to true if you want it hidden)
+                };
+
+                Process process = Process.Start(startInfo);
+                if (process != null)
+                {
+                    process.WaitForExit(); // Optional: Wait for the process to exit if needed
+                    Console.WriteLine($"Successfully executed {filePath}");
+                }
+                else
+                {
+                    Console.WriteLine($"Process could not be started for {filePath}");
+                }
             }
             catch (Exception e)
             {
