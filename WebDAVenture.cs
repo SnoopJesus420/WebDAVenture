@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Net.NetworkInformation;
 
 namespace WebDAVLauncher
 {
@@ -30,7 +31,7 @@ namespace WebDAVLauncher
 
         static void Main(string[] args)
         {
-            string driveLetter = "your drive letter as Z:";
+            string driveLetter = "Z:";
             string webdavUrl = "https://your-site.com/webdav";
             string fileToExecute = Path.Combine(driveLetter, "change-me.bat"); // Adjust the file name and extension as needed
             string username = "example"; // Set this to null if no username is needed
@@ -38,6 +39,13 @@ namespace WebDAVLauncher
 
             try
             {
+                // Check network connectivity
+                if (!IsNetworkAvailable())
+                {
+                    Console.WriteLine("Network is not available. Exiting.");
+                    return;
+                }
+
                 // Map the WebDAV share to the specified drive letter
                 MapWebDAVDrive(driveLetter, webdavUrl, username, password);
 
@@ -51,8 +59,20 @@ namespace WebDAVLauncher
             }
         }
 
+        private static bool IsNetworkAvailable()
+        {
+            return NetworkInterface.GetIsNetworkAvailable();
+        }
+
         private static void MapWebDAVDrive(string driveLetter, string webdavUrl, string username, string password)
         {
+            // Check if the drive letter is already in use
+            if (Directory.Exists(driveLetter))
+            {
+                Console.WriteLine($"Drive letter {driveLetter} is already in use. Exiting.");
+                return;
+            }
+
             NETRESOURCE netResource = new NETRESOURCE
             {
                 dwType = 1, // RESOURCETYPE_DISK
@@ -90,7 +110,12 @@ namespace WebDAVLauncher
                 Process process = Process.Start(startInfo);
                 if (process != null)
                 {
-                    process.WaitForExit(); // Optional: Wait for the process to exit if needed
+                    // Optional: Wait for the process to exit, with a timeout
+                    if (!process.WaitForExit(60000)) // Wait for a maximum of 60 seconds
+                    {
+                        Console.WriteLine($"Process for {filePath} is taking too long. Killing the process.");
+                        process.Kill();
+                    }
                     Console.WriteLine($"Successfully executed {filePath}");
                 }
                 else
@@ -106,6 +131,13 @@ namespace WebDAVLauncher
 
         private static void UnmapWebDAVDrive(string driveLetter)
         {
+            // Ensure that the drive letter is actually mapped before attempting to unmap
+            if (!Directory.Exists(driveLetter))
+            {
+                Console.WriteLine($"Drive letter {driveLetter} is not mapped. Nothing to unmap.");
+                return;
+            }
+
             int result = WNetCancelConnection2(driveLetter, 0, true);
 
             if (result != 0)
