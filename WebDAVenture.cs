@@ -32,10 +32,12 @@ namespace WebDAVLauncher
         static void Main(string[] args)
         {
             string driveLetter = "Z:";
-            string webdavUrl = "https://your-site.com/webdav";
+            string webdavUrl = "https://your-webdav-share.com";
             string fileToExecute = Path.Combine(driveLetter, "change-me.bat"); // Adjust the file name and extension as needed
-            string username = "example"; // Set this to null if no username is needed
-            string password = "example"; // Set this to null if no password is needed
+
+            // Set to null if no credentials are needed
+            string username = null;
+            string password = null;
 
             try
             {
@@ -80,7 +82,11 @@ namespace WebDAVLauncher
                 lpRemoteName = webdavUrl
             };
 
-            int result = WNetAddConnection2(ref netResource, password, username, 0);
+            // Set credentials to null if they are not required
+            string user = string.IsNullOrEmpty(username) ? null : username;
+            string pass = string.IsNullOrEmpty(password) ? null : password;
+
+            int result = WNetAddConnection2(ref netResource, pass, user, 0);
 
             if (result != 0)
             {
