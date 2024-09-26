@@ -20,5 +20,5 @@ msbuild <your-project.sln>
 1. Remove console window
 
 # Things added
-Better error handling
+Better error handling <br>
 D/Invoke for WinAPI calls
