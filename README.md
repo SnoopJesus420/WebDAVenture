@@ -18,4 +18,7 @@ msbuild <your-project.sln>
 
 # Things to come
 1. Remove console window
-2. Implement better obfuscation techniques >:)
+
+# Things added
+Better error handling
+D/Invoke for WinAPI calls
