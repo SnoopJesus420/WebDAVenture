@@ -1,3 +1,5 @@
+// Written by SnoopJesus420 -> https://github.com/SnoopJesus420/
+
 using System;
 using System.Diagnostics;
 using System.IO;
